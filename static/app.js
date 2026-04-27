@@ -254,6 +254,26 @@ $("btn").addEventListener("click", async () => {
   }
 });
 
+const MODO_KEY = "safeaccess.modo-pro";
+
+function aplicarModo(pro) {
+  document.body.classList.toggle("modo-pro", pro);
+  const btn = $("btn-modo");
+  const txt = $("btn-modo-txt");
+  btn.setAttribute("aria-pressed", pro ? "true" : "false");
+  txt.textContent = pro ? "Mostrar demonstração" : "Modo profissional";
+  try { localStorage.setItem(MODO_KEY, pro ? "1" : "0"); } catch (_) {}
+}
+
+$("btn-modo").addEventListener("click", () => {
+  const ativo = document.body.classList.contains("modo-pro");
+  aplicarModo(!ativo);
+});
+
+try {
+  if (localStorage.getItem(MODO_KEY) === "1") aplicarModo(true);
+} catch (_) {}
+
 $("btn-clear").addEventListener("click", () => {
   $("tag").value = "";
   document.querySelectorAll(".btn-cenario").forEach((b) => b.classList.remove("is-selected"));

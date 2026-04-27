@@ -73,6 +73,12 @@ code {
   padding: 0.85rem 1.5rem;
 }
 
+.topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
 .brand {
   display: flex;
   align-items: center;
@@ -165,6 +171,15 @@ code {
   .layout {
     grid-template-columns: 1fr;
   }
+}
+
+body.modo-pro .col--left {
+  display: none;
+}
+
+body.modo-pro .layout {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 980px;
 }
 
 .col {
@@ -515,6 +530,18 @@ input[type="text"] {
   color: var(--text);
   border-color: var(--border-strong);
   background: var(--bg-2);
+}
+
+.btn--sm {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.78rem;
+  border-radius: 8px;
+}
+
+.btn[aria-pressed="true"] {
+  background: rgba(74, 168, 255, 0.12);
+  color: #cfe1f7;
+  border-color: rgba(74, 168, 255, 0.45);
 }
 
 .btn__icon {
