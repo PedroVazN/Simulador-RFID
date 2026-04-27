@@ -3,80 +3,195 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Simulador — RFID + RH + MES</title>
+  <title>SafeAccess RFID — Integração MES × RH × CLP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/static/styles.css" />
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <h1>Integração RFID × RH × MES (simulado)</h1>
-      <p class="sub lead">
-        Este painel <strong>imita</strong> o que acontece na fábrica: o <strong>leitor de crachá</strong> envia a tag RFID,
-        o <strong>servidor (como o MES)</strong> pergunta ao <strong>RH do ERP</strong> se aquele colaborador tem
-        <strong>treinamento com status <em>Ativo</em></strong> para aquela <strong>máquina</strong>. Só então o MES
-        sinalizaria <strong>Start_Permit</strong> para o <strong>CLP</strong> começar o ciclo. Aqui, tudo é fictício, mas
-        a ordem das decisões é a mesma.
-      </p>
-    </header>
-
-    <section class="card expl">
-      <h2>Como o fluxo é avaliado (em ordem)</h2>
-      <ol class="passos">
-        <li>É lida a <strong>tag do crachá</strong> (você digita o código para simular a leitura).</li>
-        <li>É verificado se a tag <strong>existe no cadastro de RH</strong> (simulado neste demo).</li>
-        <li>O <strong>status do treinamento</strong> precisa ser exatamente <strong>Ativo</strong> (outros status bloqueiam).</li>
-        <li>A <strong>máquina selecionada</strong> precisa estar na <strong>lista de máquinas</strong> que o colaborador pode operar com aquele treinamento.</li>
-        <li>Se tudo passar, o retorno indica <strong>Start_Permit = sim</strong> (no projeto real, isso iria ao CLP via MES/OPC).</li>
-      </ol>
-    </section>
-
-    <section class="card">
-      <h2>Teste rápido: escolha um cenário</h2>
-      <p class="help">
-        Clique em um dos botões abaixo. Eles <strong>preenchem a máquina e a tag</strong> com valores de teste. Depois clique em
-        <strong>“Simular leitura e consultar RH”</strong> para ver o resultado. Assim você valida, um a um, os casos
-        de sucesso e de bloqueio.
-      </p>
-      <p id="cenario-ativo" class="cenario-destaque" aria-live="polite">Nenhum cenário de teste selecionado — preencha manualmente ou use um botão abaixo.</p>
-      <div id="cenarios" class="cenario-grid"></div>
-    </section>
-
-    <section class="card">
-      <h2>Chão de fábrica (simulado)</h2>
-      <p class="help small">
-        <strong>Máquina:</strong> qual equipamento o operador tenta habilitar (como o MES identifica o posto).<br />
-        <strong>Tag RFID:</strong> o que o leitor leria do crachá; no demo digitamos o código.
-      </p>
-      <label for="maquina">Máquina (MES / posto)</label>
-      <select id="maquina" aria-describedby="maquina-hint">
-        <option value="CNC-01">CNC-01</option>
-        <option value="PRENSA-03">PRENSA-03</option>
-      </select>
-      <p id="maquina-hint" class="field-hint">Cada pessoa de teste no RH simulado pode estar liberada em uma ou duas máquinas.</p>
-
-      <label for="tag">Tag RFID (código lido no crachá)</label>
-      <input id="tag" type="text" placeholder="Ex.: E004A1F2" autocomplete="off" />
-
-      <div class="row">
-        <button type="button" id="btn" class="btn-prim">Simular leitura e consultar RH</button>
-        <span id="loading" class="loading hidden">Consultando…</span>
+  <div class="topbar">
+    <div class="topbar__inner">
+      <div class="brand">
+        <span class="brand__mark" aria-hidden="true"></span>
+        <div class="brand__txt">
+          <strong>SafeAccess RFID</strong>
+          <span>Simulador de Liberação MES × RH × CLP</span>
+        </div>
       </div>
-    </section>
-
-    <section class="card result" id="painel">
-      <h2>Resultado da simulação</h2>
-      <p class="help small">Abaixo: o que o <strong>backend de demonstração</strong> devolve após a “consulta ao RH”
-        (nome do colaborador, motivo, e se o MES liberaria o <strong>Start_Permit</strong>).</p>
-      <p id="msg" class="msg neutro">Aguardando: escolha um cenário de teste ou preencha os campos, depois clique em Simular.</p>
-      <dl class="grid" id="detalhes"></dl>
-    </section>
-
-    <section class="card muted">
-      <h3>Cadastro de RH (simulado) — referência</h3>
-      <p class="help small">Use esta lista para entender por que cada teste libera ou bloqueia. Os botões de cenário usam exatamente esses dados.</p>
-      <ul id="lista-demo"></ul>
-    </section>
+      <div class="status-pill" id="status-srv">
+        <span class="dot"></span><span id="status-srv-txt">Conectando ao servidor…</span>
+      </div>
+    </div>
   </div>
+
+  <main class="layout">
+
+    <!-- COLUNA ESQUERDA: explicações / demonstração -->
+    <aside class="col col--left">
+      <section class="card hero">
+        <h1>Liberação segura de máquina via crachá RFID</h1>
+        <p class="lead">
+          Plataforma de simulação que reproduz o fluxo industrial de
+          <strong>Identificação por crachá → Verificação de treinamento no ERP → Permissão de partida ao CLP</strong>.
+          O sinal <code>Start_Permit</code> só é emitido quando o colaborador tem treinamento <strong>Ativo</strong>
+          para a máquina envolvida.
+        </p>
+      </section>
+
+      <section class="card">
+        <h2 class="sec-title">Arquitetura conceitual</h2>
+        <ol class="flow">
+          <li>
+            <span class="flow__num">1</span>
+            <div>
+              <strong>Leitor RFID</strong>
+              <p>Captura a tag do crachá do operador no posto de trabalho.</p>
+            </div>
+          </li>
+          <li>
+            <span class="flow__num">2</span>
+            <div>
+              <strong>Serviço MES</strong>
+              <p>Recebe <code>tag</code> + <code>id_máquina</code> e consulta o RH antes de qualquer comando.</p>
+            </div>
+          </li>
+          <li>
+            <span class="flow__num">3</span>
+            <div>
+              <strong>RH / ERP</strong>
+              <p>Retorna o status de treinamento e as máquinas habilitadas para aquele colaborador.</p>
+            </div>
+          </li>
+          <li>
+            <span class="flow__num">4</span>
+            <div>
+              <strong>CLP</strong>
+              <p>Recebe <code>Start_Permit</code> apenas se o RH validar; caso contrário, partida bloqueada.</p>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <section class="card">
+        <h2 class="sec-title">Critérios de liberação</h2>
+        <ul class="checks">
+          <li><span class="chk">1</span> Tag <strong>existe</strong> no cadastro do RH.</li>
+          <li><span class="chk">2</span> <code>status_treinamento</code> = <strong>Ativo</strong>.</li>
+          <li><span class="chk">3</span> Máquina selecionada está na <strong>lista de habilitação</strong>.</li>
+          <li><span class="chk">4</span> Falhando qualquer item: <strong>partida bloqueada</strong>.</li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <h2 class="sec-title">Cadastro de RH simulado</h2>
+        <p class="muted-txt">Dados fictícios usados pelos cenários de teste à direita.</p>
+        <div class="tbl-wrap">
+          <table class="tbl" id="tbl-rh">
+            <thead>
+              <tr>
+                <th>Tag</th>
+                <th>Colaborador</th>
+                <th>Treinamento</th>
+                <th>Máquinas</th>
+              </tr>
+            </thead>
+            <tbody><!-- preenchido via JS --></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card stack-tech">
+        <h2 class="sec-title">Stack do protótipo</h2>
+        <div class="chips">
+          <span class="chip">Python · FastAPI</span>
+          <span class="chip">HTML · CSS · JS</span>
+          <span class="chip">REST · JSON</span>
+          <span class="chip">Mock RH (in-memory)</span>
+        </div>
+      </section>
+    </aside>
+
+    <!-- COLUNA DIREITA: simulador / testes -->
+    <section class="col col--right">
+
+      <section class="card panel">
+        <header class="panel__hdr">
+          <div>
+            <h2 class="sec-title">Painel de operação</h2>
+            <p class="muted-txt">Simule a leitura do crachá e a decisão do MES em tempo real.</p>
+          </div>
+          <span class="badge">Demo</span>
+        </header>
+
+        <div class="form-grid">
+          <div class="field">
+            <label for="maquina">Máquina / posto (MES)</label>
+            <select id="maquina">
+              <option value="CNC-01">CNC-01</option>
+              <option value="PRENSA-03">PRENSA-03</option>
+            </select>
+            <span class="field-hint">Identificador de equipamento controlado pelo MES.</span>
+          </div>
+
+          <div class="field">
+            <label for="tag">Tag RFID</label>
+            <input id="tag" type="text" placeholder="Ex.: E004A1F2" autocomplete="off" spellcheck="false" />
+            <span class="field-hint">Código lido no crachá (UID hexadecimal).</span>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="button" id="btn" class="btn btn--prim">
+            <span class="btn__icon" aria-hidden="true">⏵</span>
+            Simular leitura e consultar RH
+          </button>
+          <button type="button" id="btn-clear" class="btn btn--ghost">Limpar</button>
+          <span id="loading" class="loading hidden">Consultando RH…</span>
+        </div>
+      </section>
+
+      <section class="card result-card" id="painel">
+        <header class="result-hdr">
+          <h2 class="sec-title">Resultado</h2>
+          <span class="result-tag" id="result-tag">Aguardando</span>
+        </header>
+
+        <p id="msg" class="msg neutro">
+          Selecione um cenário ao lado direito ou preencha os campos acima e clique em
+          <strong>Simular leitura e consultar RH</strong>.
+        </p>
+
+        <div class="kv-grid" id="detalhes"></div>
+
+        <div class="signal" id="signal">
+          <div class="signal__row">
+            <span class="signal__label">Sinal Start_Permit ao CLP</span>
+            <span class="signal__value" id="signal-value">—</span>
+          </div>
+          <div class="signal__bar"><div class="signal__fill" id="signal-fill"></div></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <header class="panel__hdr">
+          <div>
+            <h2 class="sec-title">Cenários de teste</h2>
+            <p class="muted-txt">Clique para preencher os campos automaticamente, depois clique em Simular.</p>
+          </div>
+          <span class="badge badge--ghost" id="cenario-ativo-badge">Nenhum selecionado</span>
+        </header>
+        <div id="cenarios" class="cenario-grid"></div>
+      </section>
+
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span>SafeAccess RFID · protótipo acadêmico</span>
+    <span>FastAPI · Uvicorn · Mock RH</span>
+  </footer>
+
   <script src="/static/app.js"></script>
 </body>
 </html>
