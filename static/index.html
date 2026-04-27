@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Simulador — RFID + RH + MES</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Integração RFID × RH × MES (simulado)</h1>
+      <p class="sub lead">
+        Este painel <strong>imita</strong> o que acontece na fábrica: o <strong>leitor de crachá</strong> envia a tag RFID,
+        o <strong>servidor (como o MES)</strong> pergunta ao <strong>RH do ERP</strong> se aquele colaborador tem
+        <strong>treinamento com status <em>Ativo</em></strong> para aquela <strong>máquina</strong>. Só então o MES
+        sinalizaria <strong>Start_Permit</strong> para o <strong>CLP</strong> começar o ciclo. Aqui, tudo é fictício, mas
+        a ordem das decisões é a mesma.
+      </p>
+    </header>
+
+    <section class="card expl">
+      <h2>Como o fluxo é avaliado (em ordem)</h2>
+      <ol class="passos">
+        <li>É lida a <strong>tag do crachá</strong> (você digita o código para simular a leitura).</li>
+        <li>É verificado se a tag <strong>existe no cadastro de RH</strong> (simulado neste demo).</li>
+        <li>O <strong>status do treinamento</strong> precisa ser exatamente <strong>Ativo</strong> (outros status bloqueiam).</li>
+        <li>A <strong>máquina selecionada</strong> precisa estar na <strong>lista de máquinas</strong> que o colaborador pode operar com aquele treinamento.</li>
+        <li>Se tudo passar, o retorno indica <strong>Start_Permit = sim</strong> (no projeto real, isso iria ao CLP via MES/OPC).</li>
+      </ol>
+    </section>
+
+    <section class="card">
+      <h2>Teste rápido: escolha um cenário</h2>
+      <p class="help">
+        Clique em um dos botões abaixo. Eles <strong>preenchem a máquina e a tag</strong> com valores de teste. Depois clique em
+        <strong>“Simular leitura e consultar RH”</strong> para ver o resultado. Assim você valida, um a um, os casos
+        de sucesso e de bloqueio.
+      </p>
+      <p id="cenario-ativo" class="cenario-destaque" aria-live="polite">Nenhum cenário de teste selecionado — preencha manualmente ou use um botão abaixo.</p>
+      <div id="cenarios" class="cenario-grid"></div>
+    </section>
+
+    <section class="card">
+      <h2>Chão de fábrica (simulado)</h2>
+      <p class="help small">
+        <strong>Máquina:</strong> qual equipamento o operador tenta habilitar (como o MES identifica o posto).<br />
+        <strong>Tag RFID:</strong> o que o leitor leria do crachá; no demo digitamos o código.
+      </p>
+      <label for="maquina">Máquina (MES / posto)</label>
+      <select id="maquina" aria-describedby="maquina-hint">
+        <option value="CNC-01">CNC-01</option>
+        <option value="PRENSA-03">PRENSA-03</option>
+      </select>
+      <p id="maquina-hint" class="field-hint">Cada pessoa de teste no RH simulado pode estar liberada em uma ou duas máquinas.</p>
+
+      <label for="tag">Tag RFID (código lido no crachá)</label>
+      <input id="tag" type="text" placeholder="Ex.: E004A1F2" autocomplete="off" />
+
+      <div class="row">
+        <button type="button" id="btn" class="btn-prim">Simular leitura e consultar RH</button>
+        <span id="loading" class="loading hidden">Consultando…</span>
+      </div>
+    </section>
+
+    <section class="card result" id="painel">
+      <h2>Resultado da simulação</h2>
+      <p class="help small">Abaixo: o que o <strong>backend de demonstração</strong> devolve após a “consulta ao RH”
+        (nome do colaborador, motivo, e se o MES liberaria o <strong>Start_Permit</strong>).</p>
+      <p id="msg" class="msg neutro">Aguardando: escolha um cenário de teste ou preencha os campos, depois clique em Simular.</p>
+      <dl class="grid" id="detalhes"></dl>
+    </section>
+
+    <section class="card muted">
+      <h3>Cadastro de RH (simulado) — referência</h3>
+      <p class="help small">Use esta lista para entender por que cada teste libera ou bloqueia. Os botões de cenário usam exatamente esses dados.</p>
+      <ul id="lista-demo"></ul>
+    </section>
+  </div>
+  <script src="/static/app.js"></script>
+</body>
+</html>

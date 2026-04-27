@@ -1,0 +1,283 @@
+:root {
+  --bg: #0f1419;
+  --card: #1a2332;
+  --text: #e7ecf3;
+  --muted: #8b98a8;
+  --ok: #2ecc71;
+  --bad: #e74c3c;
+  --accent: #3498db;
+  --border: #2d3a4d;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: radial-gradient(1200px 600px at 20% 0%, #1a2a3d 0%, var(--bg) 55%);
+  color: var(--text);
+}
+
+.wrap {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 3rem;
+}
+
+header h1 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+}
+
+.sub {
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.sub.lead {
+  line-height: 1.6;
+  font-size: 0.98rem;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem 1.35rem;
+  margin-top: 1.25rem;
+}
+
+.card h2,
+.card h3 {
+  font-size: 1rem;
+  margin: 0 0 1rem;
+  font-weight: 600;
+}
+
+.card.expl h2 {
+  margin-bottom: 0.75rem;
+}
+
+.passos {
+  margin: 0;
+  padding-left: 1.2rem;
+  line-height: 1.7;
+  font-size: 0.92rem;
+  color: var(--text);
+}
+
+.passos li {
+  margin-bottom: 0.45rem;
+}
+
+.passos li:last-child {
+  margin-bottom: 0;
+}
+
+.help {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  margin: 0 0 1rem;
+}
+
+.help.small {
+  font-size: 0.85rem;
+  margin-bottom: 0.85rem;
+}
+
+.field-hint {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin: 0.35rem 0 0.85rem;
+  line-height: 1.45;
+}
+
+.cenario-destaque {
+  background: #121a26;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  margin: 0 0 1rem;
+  color: #c5d0dd;
+}
+
+.cenario-destaque code {
+  font-size: 0.85em;
+  background: #0c1018;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  color: #7ec8ff;
+}
+
+.cenario-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.btn-cenario {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: #243044;
+  border: 1px solid var(--border);
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text);
+  font: inherit;
+}
+
+.btn-cenario:hover {
+  background: #2a3850;
+  border-color: #3d4f6a;
+}
+
+.btn-cenario.is-selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px rgba(52, 152, 219, 0.35);
+  background: #1e2f45;
+}
+
+.btn-cenario__titulo {
+  display: block;
+  font-weight: 600;
+  font-size: 0.92rem;
+  margin-bottom: 0.25rem;
+}
+
+.btn-cenario__desc {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--muted);
+  line-height: 1.4;
+  font-weight: 400;
+}
+
+.btn-cenario__esp {
+  display: block;
+  font-size: 0.75rem;
+  color: #9aadbf;
+  margin-top: 0.35rem;
+}
+
+button.btn-prim {
+  background: var(--accent);
+}
+
+label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-bottom: 0.35rem;
+  margin-top: 0.85rem;
+}
+
+label:first-of-type {
+  margin-top: 0;
+}
+
+select,
+input {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #121a26;
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.1rem;
+}
+
+button {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 0.7rem 1.1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:hover {
+  filter: brightness(1.08);
+}
+
+.loading {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.hidden {
+  display: none;
+}
+
+.result .msg {
+  font-size: 1rem;
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.msg.ok {
+  border-color: rgba(46, 204, 113, 0.45);
+  background: rgba(46, 204, 113, 0.12);
+  color: #b8f0cd;
+}
+
+.msg.erro {
+  border-color: rgba(231, 76, 60, 0.45);
+  background: rgba(231, 76, 60, 0.12);
+  color: #f5b4ad;
+}
+
+.msg.neutro {
+  color: var(--muted);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.35rem 1rem;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.grid dt {
+  color: var(--muted);
+  margin: 0;
+}
+
+.grid dd {
+  margin: 0;
+  font-weight: 500;
+}
+
+.card.muted {
+  background: #141c28;
+}
+
+.card.muted ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
